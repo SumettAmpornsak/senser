@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>การวัดระนาบและทิศทาง</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            text-align: center;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        #gyro-output, #compass-output {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .gyro, .compass {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>เครื่องมือวัดระนาบและทิศทาง</h1>
+        <div class="gyro">
+            <h2>การวัดระนาบ</h2>
+            <div id="gyro-output">รอการวัด...</div>
+        </div>
+        <div class="compass">
+            <h2>ทิศทาง</h2>
+            <div id="compass-output">รอการเชื่อมต่อ...</div>
+        </div>
+    </div>
+
+    <script>
+        // ตรวจสอบว่ามือถือรองรับการใช้ Sensor หรือไม่
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener("deviceorientation", handleOrientation);
+        } else {
+            alert("อุปกรณ์ของคุณไม่รองรับการใช้ Gyroscope!");
+        }
+
+        // ฟังก์ชันการแสดงผลการวัดระนาบ
+        function handleOrientation(event) {
+            const alpha = event.alpha; // วัดการหมุนรอบแกน Z
+            const beta = event.beta;   // วัดการหมุนรอบแกน X
+            const gamma = event.gamma; // วัดการหมุนรอบแกน Y
+
+            // แสดงผลการหมุนของเครื่อง
+            document.getElementById("gyro-output").textContent = 
+                `การหมุนรอบแกน X: ${beta.toFixed(2)}° \nการหมุนรอบแกน Y: ${gamma.toFixed(2)}° \nการหมุนรอบแกน Z: ${alpha.toFixed(2)}°`;
+        }
+
+        // ฟังก์ชันการแสดงผลทิศทาง
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener("deviceorientation", (event) => {
+                const heading = event.alpha; // ทิศทางที่วัดจากเข็มทิศ
+                const direction = getDirection(heading);
+                document.getElementById("compass-output").textContent = `ทิศทาง: ${direction}`;
+            });
+        }
+
+        // ฟังก์ชันเพื่อแปลงมุมเป็นทิศทาง
+        function getDirection(heading) {
+            if (heading >= 0 && heading <= 45 || heading > 315) {
+                return "ทิศเหนือ (N)";
+            } else if (heading > 45 && heading <= 135) {
+                return "ทิศตะวันออก (E)";
+            } else if (heading > 135 && heading <= 225) {
+                return "ทิศใต้ (S)";
+            } else if (heading > 225 && heading <= 315) {
+                return "ทิศตะวันตก (W)";
+            }
+        }
+    </script>
+</body>
+</html>
