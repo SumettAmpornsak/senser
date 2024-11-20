@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>การวัดระนาบและทิศทาง</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css" rel="stylesheet"> <!-- Font Awesome for icons -->
     <style>
         * {
             margin: 0;
@@ -41,27 +42,94 @@
             margin-bottom: 10px;
         }
 
+        .gyro, .compass {
+            margin-bottom: 20px;
+        }
+
         #gyro-output, #compass-output {
             font-size: 18px;
             font-weight: bold;
             margin-top: 10px;
+            margin-bottom: 20px;
         }
 
-        .gyro, .compass {
-            margin-bottom: 20px;
+        /* เพิ่มการแสดงผลของเข็มทิศ */
+        .compass-wrapper {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            border-radius: 50%;
+            border: 2px solid #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .compass-arrow {
+            position: absolute;
+            width: 2px;
+            height: 50px;
+            background-color: #ff5722;
+            transform-origin: 50% 100%;
+            transform: rotate(0deg);
+        }
+
+        .gyro-icons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .gyro-icons i {
+            font-size: 30px;
+            color: #333;
+        }
+
+        /* ไอคอนการหมุนแกน */
+        .icon-container {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .icon-container .icon {
+            font-size: 30px;
+            color: #333;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>เครื่องมือวัดระนาบและทิศทาง</h1>
+        
+        <!-- การแสดงผลทิศทาง -->
+        <div class="compass">
+            <h2>ทิศทาง</h2>
+            <div class="compass-wrapper">
+                <div id="compass-arrow" class="compass-arrow"></div>
+            </div>
+            <div id="compass-output">รอการเชื่อมต่อ...</div>
+        </div>
+
+        <!-- การแสดงผลการวัดระนาบ -->
         <div class="gyro">
             <h2>การวัดระนาบ</h2>
             <div id="gyro-output">รอการวัด...</div>
-        </div>
-        <div class="compass">
-            <h2>ทิศทาง</h2>
-            <div id="compass-output">รอการเชื่อมต่อ...</div>
+            <div class="icon-container">
+                <div>
+                    <i id="icon-x" class="fa fa-arrow-up"></i>
+                    <p>แกน X</p>
+                </div>
+                <div>
+                    <i id="icon-y" class="fa fa-arrow-left"></i>
+                    <p>แกน Y</p>
+                </div>
+                <div>
+                    <i id="icon-z" class="fa fa-arrow-right"></i>
+                    <p>แกน Z</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -82,6 +150,11 @@
             // แสดงผลการหมุนของเครื่อง
             document.getElementById("gyro-output").textContent = 
                 `การหมุนรอบแกน X: ${beta.toFixed(2)}° \nการหมุนรอบแกน Y: ${gamma.toFixed(2)}° \nการหมุนรอบแกน Z: ${alpha.toFixed(2)}°`;
+
+            // ปรับไอคอนให้แสดงตามการหมุนของแต่ละแกน
+            document.getElementById("icon-x").style.transform = `rotate(${beta}deg)`;
+            document.getElementById("icon-y").style.transform = `rotate(${gamma}deg)`;
+            document.getElementById("icon-z").style.transform = `rotate(${alpha}deg)`;
         }
 
         // ฟังก์ชันการแสดงผลทิศทาง
@@ -90,6 +163,10 @@
                 const heading = event.alpha; // ทิศทางที่วัดจากเข็มทิศ
                 const direction = getDirection(heading);
                 document.getElementById("compass-output").textContent = `ทิศทาง: ${direction}`;
+
+                // ปรับการหมุนของเข็มทิศ
+                const compassArrow = document.getElementById("compass-arrow");
+                compassArrow.style.transform = `rotate(${heading}deg)`;
             });
         }
 
