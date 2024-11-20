@@ -68,15 +68,23 @@
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
         }
 
+        .compass-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
         .compass-arrow {
             position: absolute;
-            width: 4px;
-            height: 80px;
-            background-color: #ff5722;
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 40px solid red;
             transform-origin: 50% 100%;
             transform: rotate(0deg);
-            border-radius: 10px;
-            box-shadow: 0 0 8px rgba(255, 87, 34, 0.8);
         }
 
         /* การแสดงทิศทาง N, S, E, W */
@@ -143,100 +151,21 @@
         <div class="compass">
             <h2>ทิศทาง</h2>
             <div class="compass-wrapper">
+                <div class="compass-circle"></div>
                 <div id="compass-arrow" class="compass-arrow"></div>
                 <div class="compass-direction north">N</div>
                 <div class="compass-direction south">S</div>
                 <div class="compass-direction east">E</div>
                 <div class="compass-direction west">W</div>
-
-                <!-- เพิ่มตัวเลขในวงรอบเข็มทิศ -->
-                <div class="degree-wrapper">
-                    <span style="transform: rotate(0deg); top: 0%;">0°</span>
-                    <span style="transform: rotate(10deg); top: 0%;">10°</span>
-                    <span style="transform: rotate(20deg); top: 0%;">20°</span>
-                    <span style="transform: rotate(30deg); top: 0%;">30°</span>
-                    <span style="transform: rotate(40deg); top: 0%;">40°</span>
-                    <span style="transform: rotate(50deg); top: 0%;">50°</span>
-                    <span style="transform: rotate(60deg); top: 0%;">60°</span>
-                    <span style="transform: rotate(70deg); top: 0%;">70°</span>
-                    <span style="transform: rotate(80deg); top: 0%;">80°</span>
-                    <span style="transform: rotate(90deg); top: 0%;">90°</span>
-                    <span style="transform: rotate(100deg); top: 0%;">100°</span>
-                    <span style="transform: rotate(110deg); top: 0%;">110°</span>
-                    <span style="transform: rotate(120deg); top: 0%;">120°</span>
-                    <span style="transform: rotate(130deg); top: 0%;">130°</span>
-                    <span style="transform: rotate(140deg); top: 0%;">140°</span>
-                    <span style="transform: rotate(150deg); top: 0%;">150°</span>
-                    <span style="transform: rotate(160deg); top: 0%;">160°</span>
-                    <span style="transform: rotate(170deg); top: 0%;">170°</span>
-                    <span style="transform: rotate(180deg); top: 0%;">180°</span>
-                    <span style="transform: rotate(190deg); top: 0%;">190°</span>
-                    <span style="transform: rotate(200deg); top: 0%;">200°</span>
-                    <span style="transform: rotate(210deg); top: 0%;">210°</span>
-                    <span style="transform: rotate(220deg); top: 0%;">220°</span>
-                    <span style="transform: rotate(230deg); top: 0%;">230°</span>
-                    <span style="transform: rotate(240deg); top: 0%;">240°</span>
-                    <span style="transform: rotate(250deg); top: 0%;">250°</span>
-                    <span style="transform: rotate(260deg); top: 0%;">260°</span>
-                    <span style="transform: rotate(270deg); top: 0%;">270°</span>
-                    <span style="transform: rotate(280deg); top: 0%;">280°</span>
-                    <span style="transform: rotate(290deg); top: 0%;">290°</span>
-                    <span style="transform: rotate(300deg); top: 0%;">300°</span>
-                    <span style="transform: rotate(310deg); top: 0%;">310°</span>
-                    <span style="transform: rotate(320deg); top: 0%;">320°</span>
-                    <span style="transform: rotate(330deg); top: 0%;">330°</span>
-                    <span style="transform: rotate(340deg); top: 0%;">340°</span>
-                </div>
-            </div>
-            <div id="compass-output">รอการเชื่อมต่อ...</div>
-        </div>
-
-        <!-- การแสดงผลการวัดระนาบ -->
-        <div class="gyro">
-            <h2>การวัดระนาบ</h2>
-            <div id="gyro-output">รอการวัด...</div>
-            <div class="icon-container">
-                <div>
-                    <i id="icon-x" class="fa fa-arrow-up"></i>
-                    <p>แกน X</p>
-                </div>
-                <div>
-                    <i id="icon-y" class="fa fa-arrow-left"></i>
-                    <p>แกน Y</p>
-                </div>
-                <div>
-                    <i id="icon-z" class="fa fa-arrow-right"></i>
-                    <p>แกน Z</p>
-                </div>
             </div>
         </div>
+
+        <!-- การแสดงผลจากการหมุน -->
+        <div id="gyro-output">การหมุน: 0</div>
+        <div id="compass-output">ทิศทาง: N</div>
     </div>
 
     <script>
-        // ตรวจสอบว่ามือถือรองรับการใช้ Sensor หรือไม่
-        if (window.DeviceOrientationEvent) {
-            window.addEventListener("deviceorientation", handleOrientation);
-        } else {
-            alert("อุปกรณ์ของคุณไม่รองรับการใช้ Gyroscope!");
-        }
-
-        // ฟังก์ชันการแสดงผลการวัดระนาบ
-        function handleOrientation(event) {
-            const alpha = event.alpha; // วัดการหมุนรอบแกน Z
-            const beta = event.beta;   // วัดการหมุนรอบแกน X
-            const gamma = event.gamma; // วัดการหมุนรอบแกน Y
-
-            // แสดงผลการหมุนของเครื่อง
-            document.getElementById("gyro-output").textContent = 
-                `แกน X: ${beta.toFixed(2)}° \nแกน Y: ${gamma.toFixed(2)}° \nแกน Z: ${alpha.toFixed(2)}°`;
-
-            // ปรับไอคอนให้แสดงตามการหมุนของแต่ละแกน
-            document.getElementById("icon-x").style.transform = `rotate(${beta}deg)`;
-            document.getElementById("icon-y").style.transform = `rotate(${gamma}deg)`;
-            document.getElementById("icon-z").style.transform = `rotate(${alpha}deg)`;
-        }
-
-        // ฟังก์ชันการแสดงผลทิศทาง
         if (window.DeviceOrientationEvent) {
             window.addEventListener("deviceorientation", (event) => {
                 const heading = event.alpha; // ทิศทางที่วัดจากเข็มทิศ
@@ -245,11 +174,17 @@
 
                 // ปรับการหมุนของเข็มทิศ
                 const compassArrow = document.getElementById("compass-arrow");
-                compassArrow.style.transform = `rotate(${heading}deg)`;
+                compassArrow.style.transform = `rotate(${heading}deg)`; // หมุนเข็ม
+
+                // ปรับหมุนตัวเลขรอบเข็มทิศ
+                const degreeSpans = document.querySelectorAll(".degree-wrapper span");
+                degreeSpans.forEach((span, index) => {
+                    const rotation = heading + (index * 10); // Adjust the rotation to match heading + degree offset
+                    span.style.transform = `rotate(${rotation}deg)`;
+                });
             });
         }
 
-        // ฟังก์ชันเพื่อแปลงมุมเป็นทิศทาง
         function getDirection(heading) {
             if (heading >= 0 && heading <= 45 || heading > 315) {
                 return "ทิศเหนือ (N)";
