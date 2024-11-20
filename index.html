@@ -42,11 +42,104 @@
             margin-bottom: 10px;
         }
 
+        .gyro, .compass {
+            margin-bottom: 20px;
+        }
+
         #gyro-output, #compass-output, #plane-output {
             font-size: 18px;
             font-weight: bold;
             margin-top: 10px;
             margin-bottom: 20px;
+        }
+
+        /* การออกแบบเข็มทิศ */
+        .compass-wrapper {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            border-radius: 50%;
+            background: #111;
+            border: 4px solid #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+        }
+
+        .compass-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .compass-arrow {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 40px solid red;
+            transform-origin: 50% 100%;
+            transform: rotate(0deg);
+        }
+
+        /* การแสดงทิศทาง N, S, E, W */
+        .compass-direction {
+            position: absolute;
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .north { top: 10px; left: 50%; transform: translateX(-50%); }
+        .south { bottom: 10px; left: 50%; transform: translateX(-50%); }
+        .east { right: 10px; top: 50%; transform: translateY(-50%); }
+        .west { left: 10px; top: 50%; transform: translateY(-50%); }
+
+        /* ตัวเลขรอบเข็มทิศ */
+        .degree-wrapper {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .degree-wrapper span {
+            position: absolute;
+            font-size: 12px;
+            color: #fff;
+        }
+
+        .gyro-icons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .gyro-icons i {
+            font-size: 30px;
+            color: #fff;
+        }
+
+        /* ไอคอนการหมุนแกน */
+        .icon-container {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .icon-container .icon {
+            font-size: 30px;
+            color: #fff;
         }
 
         /* ไอคอนระนาบ */
@@ -59,14 +152,11 @@
         .plane-icons .plane-icon {
             font-size: 30px;
             color: #fff;
-            position: relative;
         }
 
         .plane-label {
             font-size: 14px;
             color: #fff;
-            text-align: center;
-            margin-top: 5px;
         }
     </style>
 </head>
@@ -75,20 +165,33 @@
         <h1>เครื่องมือวัดระนาบและทิศทาง</h1>
         
         <!-- การแสดงผลทิศทาง -->
-        <div id="compass-output">ทิศทาง: </div>
+        <div class="compass">
+            <h2>ทิศทาง</h2>
+            <div class="compass-wrapper">
+                <div class="compass-circle"></div>
+                <div id="compass-arrow" class="compass-arrow"></div>
+                <div class="compass-direction north">N</div>
+                <div class="compass-direction south">S</div>
+                <div class="compass-direction east">E</div>
+                <div class="compass-direction west">W</div>
+            </div>
+        </div>
+
+        <!-- การแสดงผลจากการหมุน -->
+        <div id="compass-output">ทิศทาง: ...</div>
 
         <!-- การแสดงผลระนาบ พร้อมไอคอน -->
         <div id="plane-output">
             <div class="plane-icons">
-                <div class="plane-icon" id="plane-x">
+                <div class="plane-icon">
                     <i class="fa fa-arrow-up"></i>
                     <div class="plane-label">แกน X</div>
                 </div>
-                <div class="plane-icon" id="plane-y">
+                <div class="plane-icon">
                     <i class="fa fa-arrow-right"></i>
                     <div class="plane-label">แกน Y</div>
                 </div>
-                <div class="plane-icon" id="plane-z">
+                <div class="plane-icon">
                     <i class="fa fa-arrow-left"></i>
                     <div class="plane-label">แกน Z</div>
                 </div>
@@ -100,23 +203,19 @@
     <script>
         if (window.DeviceOrientationEvent) {
             window.addEventListener("deviceorientation", (event) => {
-                // อ่านข้อมูลการหมุน
-                const x = event.beta; // ค่าแกน X
-                const y = event.gamma; // ค่าแกน Y
-                const z = event.alpha; // ค่าแกน Z
-
-                // แสดงผลค่าระนาบ
-                document.getElementById("plane-values").textContent = `X: ${x.toFixed(2)} | Y: ${y.toFixed(2)} | Z: ${z.toFixed(2)}`;
-
-                // ขยับไอคอนตามค่าระนาบ
-                document.getElementById("plane-x").style.transform = `translateY(${x}px)`;
-                document.getElementById("plane-y").style.transform = `translateX(${y}px)`;
-                document.getElementById("plane-z").style.transform = `translateX(${z}px)`;
-
-                // การแสดงผลทิศทาง (เข็มทิศ)
                 const heading = event.alpha; // ทิศทางที่วัดจากเข็มทิศ
                 const direction = getDirection(heading);
                 document.getElementById("compass-output").textContent = `ทิศทาง: ${direction}`;
+
+                // ปรับการหมุนของเข็มทิศ
+                const compassArrow = document.getElementById("compass-arrow");
+                compassArrow.style.transform = `rotate(${heading}deg)`; // หมุนเข็ม
+
+                // แสดงข้อมูลระนาบพร้อมไอคอน
+                const x = event.beta; // ค่าระนาบในแกน X
+                const y = event.gamma; // ค่าระนาบในแกน Y
+                const z = event.alpha; // ค่าระนาบในแกน Z
+                document.getElementById("plane-values").textContent = `X:  ${x.toFixed(2)} | Y: ${y.toFixed(2)} | Z: ${z.toFixed(2)}`;
             });
         }
 
