@@ -46,7 +46,7 @@
             margin-bottom: 20px;
         }
 
-        #gyro-output, #compass-output {
+        #gyro-output, #compass-output, #plane-output {
             font-size: 18px;
             font-weight: bold;
             margin-top: 10px;
@@ -141,6 +141,23 @@
             font-size: 30px;
             color: #fff;
         }
+
+        /* ไอคอนระนาบ */
+        .plane-icons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+
+        .plane-icons .plane-icon {
+            font-size: 30px;
+            color: #fff;
+        }
+
+        .plane-label {
+            font-size: 14px;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -163,6 +180,25 @@
         <!-- การแสดงผลจากการหมุน -->
         <div id="gyro-output">การหมุน: 0</div>
         <div id="compass-output">ทิศทาง: N</div>
+
+        <!-- การแสดงผลระนาบ พร้อมไอคอน -->
+        <div id="plane-output">
+            <div class="plane-icons">
+                <div class="plane-icon">
+                    <i class="fa fa-arrow-up"></i>
+                    <div class="plane-label">แกนX</div>
+                </div>
+                <div class="plane-icon">
+                    <i class="fa fa-arrow-right"></i>
+                    <div class="plane-label">แกนY</div>
+                </div>
+                <div class="plane-icon">
+                    <i class="fa fa-arrow-left"></i>
+                    <div class="plane-label">แกนZ</div>
+                </div>
+            </div>
+            <div id="plane-values">แกน X: 0 | แกน Y: 0 | แกน Z: 0</div>
+        </div>
     </div>
 
     <script>
@@ -176,12 +212,11 @@
                 const compassArrow = document.getElementById("compass-arrow");
                 compassArrow.style.transform = `rotate(${heading}deg)`; // หมุนเข็ม
 
-                // ปรับหมุนตัวเลขรอบเข็มทิศ
-                const degreeSpans = document.querySelectorAll(".degree-wrapper span");
-                degreeSpans.forEach((span, index) => {
-                    const rotation = heading + (index * 10); // Adjust the rotation to match heading + degree offset
-                    span.style.transform = `rotate(${rotation}deg)`;
-                });
+                // แสดงข้อมูลระนาบพร้อมไอคอน
+                const x = event.beta; // ค่าระนาบในแกน X
+                const y = event.gamma; // ค่าระนาบในแกน Y
+                const z = event.alpha; // ค่าระนาบในแกน Z
+                document.getElementById("plane-values").textContent = `X: ${x.toFixed(2)}, Y: ${y.toFixed(2)}, Z: ${z.toFixed(2)}`;
             });
         }
 
